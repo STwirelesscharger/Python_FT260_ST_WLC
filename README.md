@@ -22,6 +22,9 @@ wbc86_register.h is WBC86 register C driver
 Use python a1_wlc38_chipinfo.py to get RX chip info
 Use python a2_wlc38_getadc.py to get RX ADC data
 Use python a3_wlc38_sendept.py to send EPT packet to TX
+Use python a4_wlc38_send_recv_pp_packet.py to send pp packet to TX and get TX reply
+Use python a5_wlc38_send_recv_dts_packet to send DTS packet to TX and get tx reply
+Use python a6_wlc38_setvout to control RX VOUT
 
 ## How to use WBC86 example code
 Use python b1_wbc86_chipinfo.py to get TX chip info

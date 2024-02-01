@@ -99,10 +99,13 @@ class ft260_dongle():
         return (str_data,rx_pwr)
 
     def wlc38_vout_set(self,val = 5000):
-        if(val > 12000):
+        if(val > 12000):#not support
             return
         rx_vout_set_h = int((val - 500)/100)
-        self.write(0x00B1,0)#Cut 1.2 and newer. Program lower 2 bits of VOUT set, with 25mV resolution.
+        rx_vout_set_l = int(int((val - 500)%100)/25)
+        print(f"rx_vout_set_l,{rx_vout_set_l},rx_vout_set_h,{rx_vout_set_h}")
+        rx_vout_set_l = rx_vout_set_l << 5;
+        self.write(0x00B1,rx_vout_set_l)#Cut 1.2 and newer. Program lower 2 bits of VOUT set, with 25mV resolution.
         # 0 - 0mV
         # 1 - 25mV
         # 2 - 50mV
