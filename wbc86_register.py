@@ -272,4 +272,6 @@ BIT_TX_BRDG_MD	 = 0
 #0x0: No change (same as ping)0x1: Manual half bridge mode0x2: Manual full bridge mode0x3: Auto switch
 BIT_TX_PING_HALF_BRDG	 = 2
 #0x0:Start ping in full bridge mode0x1:Start ping in half bridge mode
+I2CREG_TX_RX_CHS	 = 0x00EB #TX Get RX Charge Status Packet value
+I2CREG_GET_RXPP_DATA = 0x0100
 I2CREG_AUX_DATA	 = 0x0200 	# Len = 44
