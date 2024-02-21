@@ -31,6 +31,21 @@ I2CREG_GPIO1_FUNC	 = 0x0031 	# Len = 1
 I2CREG_GPIO2_FUNC	 = 0x0032 	# Len = 1
 I2CREG_GPIO3_FUNC	 = 0x0033 	# Len = 1
 I2CREG_RX_INTR_EN	 = 0x0080 	# Len = 4
+GPIO_FUNC_NONE   = 0,                 #///< 00 - in_fl:  No function (GPIO will be configured as Input floating)
+GPIO_FUNC_NONE_PU= 1,                  #///< 01 - in_pu:  No function (GPIO will be configured as Input pull-up)
+GPIO_FUNC_NONE_PD= 2,                  #///< 02 - in_pd:  No function (GPIO will be configured as Input pull-down)
+GPIO_FUNC_INTB_OD= 3,                  #///< 03 - out_od: Interrupt (0=active, 1=inactive)
+GPIO_FUNC_INTB_PP= 4,                  #///< 04 - out_pp: Interrupt (0=active, 1=inactive, useful with long wires)
+GPIO_FUNC_FW_RDY = 5,                   #///< 05 - out_pp: High on FW ready (before main loop)
+GPIO_FUNC_LDO_BLOCK= 6,                #///< 06 - in_fl:  LDO block (0=unblock, 1=block)
+GPIO_FUNC_RX_DIS_COM= 7,               #///< 07 - in_fl:  Rx stop ASK communication (0=unblock, 1=block)
+GPIO_FUNC_RX_PWR_NEGO = 0x0B,              #///< 0B - out_pp: Power negotiated (0=off, 1=on)
+GPIO_FUNC_RX_PWR_NEGO_INV = 0x0C,          #///< 0C - out_pp: Power negotiated (0=on, 1=off)
+GPIO_FUNC_RX_PWR_NEGO_OD = 0x0D,           #///< 0D - out_od: Power negotiated (0=on, 1=off)
+GPIO_FUNC_OD_LO = 0x29,                    #///< 29 - out_od: driven low
+GPIO_FUNC_OD_HI = 0x2A,                    #///< 2A - out_od: driven high
+GPIO_FUNC_PP_LO = 0x2B,                    #///< 2B - out_pp: driven low
+GPIO_FUNC_PP_HI = 0x0C,                    #///< 2C - out_pp: driven high
 BIT_RX_OVTP_INTR_EN	 = 0
 #0x0: Disabled0x1: Enabled
 BIT_RX_OCP_INTR_EN	 = 1
@@ -271,3 +286,5 @@ I2CREG_SEND_MSG	 = 0x0180
 I2CREG_RCVD_MSG  = 0x0190
 DTS_SEND_MSG_000        = 0X0200
 DTS_RCVD_MSG_000        = 0x0280
+#HW reg address
+HWREG_GPIO_INPUT_VAL_RegAddr = 0x2001A01C

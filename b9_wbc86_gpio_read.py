@@ -5,6 +5,8 @@ wbc86 = driver_ft260.ft260_dongle()
 wbc86.chip_info()
 print("example code set gpio pin as input floating and read gpio status")
 print("connect external 1.8V to GPIO1")
+wbc86.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_IN_PD)
+wbc86.write16(I2CREG_GPIO1_FUNC,GPIO_FUNC_IN_PD)
 
 value = wbc86.wreadFA(HWREG_GPIO_INPUT_VAL_RegAddr)
 print(f"gpio input value 0x{value:X}")
