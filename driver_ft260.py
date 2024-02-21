@@ -61,6 +61,56 @@ class ft260_dongle():
     def wread16(self, RegisterAddr, ReadCount = 1):
         read_buff = self.wread(RegisterAddr,ReadCount)
         return read_buff
+    
+    def writeFA(self,add32,data):
+        if(self.i2c_handle == None):
+            return
+        try:
+            add32_bytes = add32.to_bytes(4, byteorder='big')
+            if type(data) == list:
+                wdata = [0xFA,add32_bytes[0],add32_bytes[1],add32_bytes[2],add32_bytes[3]] + data
+                if(self.verbose):
+                    print("W FA @0x{:08X} >>".format(add32), ' '.join( ['{:02X}'.format(x) for x in data]) )
+            else:
+                wdata = [0xFA,add32_bytes[0],add32_bytes[1],add32_bytes[2],add32_bytes[3], data]
+                if(self.verbose):
+                    print(f"W @0x{add32:08x} = 0x{data:02x}")
+            data_list = [struct.pack("B", x) for x in wdata]
+            data_str = b"".join(data_list)
+            (ftStatus) = ftI2cWrite(self.i2c_handle,dev_addr,FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,data_str)
+        except OSError as err:
+            print("OS error: {0}".format(err))
+
+    def wreadFA(self,add32,size = 1):
+        if(self.i2c_handle == None):
+            return
+        try:
+            add32_bytes = add32.to_bytes(4, byteorder='big')
+            wdata = [0xFA,add32_bytes[0],add32_bytes[1],add32_bytes[2],add32_bytes[3]]
+            #result = bytearray(size)
+            data_list = [struct.pack("B", x) for x in wdata]
+            data_str = b"".join(data_list)
+            ftI2cWrite(self.i2c_handle,dev_addr,FT260_I2C_FLAG.FT260_I2C_START,data_str)
+            (ft_status, data_real_read_len, result, status) = ftI2cRead(self.i2c_handle,dev_addr,
+                                                                FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,size)
+            if(size == 1):
+                value = int(result.hex(),16)
+                if(self.verbose):
+                    print("R FA @0x{:08X} = 0x{:02X}".format(add32,value))
+                return value
+            elif(size == 2):
+                result = list(result)
+                #value = int(result[0].hex(),16) + int(result[1].hex(),16) * 256
+                value = result[0] + result[1] * 256
+                if(self.verbose):
+                    print("R FA @0x{:08X} = 0x{:04X}".format(add32,value))
+                return value
+            else:
+                if(self.verbose):#MSB LSB
+                    print("R FA @0x{:08X} >>".format(add32), ' '.join( ['{:02X}'.format(x) for x in list(result)]) )
+                return list(result)
+        except OSError as err:
+            print("OS error: {0}".format(err))
 
     def chip_info(self):
         read_buff = self.wread16(0x0010,16)
