@@ -41,6 +41,13 @@ I2CREG_GPIO4_FUNC	 = 0x0034 	# Len = 1
 I2CREG_GPIO5_FUNC	 = 0x0035 	# Len = 1
 I2CREG_GPIO6_FUNC	 = 0x0036 	# Len = 1
 I2CREG_GPIO7_FUNC	 = 0x0037 	# Len = 1
+GPIO_FUNC_IN_FL = 0                #< 00 - in_fl:  No function (GPIO will be configured as Input floating)
+GPIO_FUNC_IN_PU = 1                    #< 01 - in_pu:  No function (GPIO will be configured as Input pull-up)
+GPIO_FUNC_IN_PD = 2                    #< 02 - in_pd:  No function (GPIO will be configured as Input pull-down)
+GPIO_FUNC_PP_LO = 3                    #< 03 - out_pp: No function (GPIO will be configured as output drive low)
+GPIO_FUNC_PP_HI = 4                    #< 04 - out_pp: No function (GPIO will be configured as output drive high)
+GPIO_FUNC_INTB_OD = 5,                 #< 05 - out_od: Interrupt (0=active, 1=inactive)
+GPIO_FUNC_FW_RDY = 6,                  #< 06 - out_pp: High on FW ready (before main loop)
 I2CREG_MEAS_VRECT	 = 0x0040 	# Len = 2
 I2CREG_MEAS_VOUT	 = 0x0042 	# Len = 2
 I2CREG_MEAS_ICUR	 = 0x0044 	# Len = 2
