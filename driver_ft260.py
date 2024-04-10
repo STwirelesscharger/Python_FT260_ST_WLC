@@ -3,6 +3,9 @@ import atexit
 dev_addr = 0x61
 CHIPID_WLC38 = 0X0026
 CHIPID_WBC86 = 0X0056
+CHIPID_WLC89 = 0x0159
+CHIPID_WLC98 = 0x0062
+CHIPID_WLC99 = 0x0063
 class ft260_dongle():
     verbose = 1
     def __init__(self, i2c_speed = 100,dev_addr_set = 0x61):
@@ -128,6 +131,10 @@ class ft260_dongle():
             print("CHIPID_WLC38")
         elif(CHIPID_WBC86 == chipid):
             print("CHIPID_WBC86")
+        elif(CHIPID_WLC98 == chipid):
+            print("CHIPID_WLC98")
+        elif(CHIPID_WLC99 == chipid):
+            print("CHIPID_WLC99")
         return (patchid,cfgid,chipid)
     def rx_data(self):#wlc38
         read_buff = self.wread(0x0092,10)
@@ -156,8 +163,25 @@ class ft260_dongle():
         print(f"rx_vout_set_l,{rx_vout_set_l},rx_vout_set_h,{rx_vout_set_h}")
         rx_vout_set_l = rx_vout_set_l << 5;
         self.write(0x00B1,rx_vout_set_l)#Cut 1.2 and newer. Program lower 2 bits of VOUT set, with 25mV resolution.
-        # 0 - 0mV
-        # 1 - 25mV
-        # 2 - 50mV
-        # 3 - 75mV
+        # 0 - 0mV 1 - 25mV 2 - 50mV 3 - 75mV
         self.write(0x00B2,rx_vout_set_h)
+
+    def wlc99_vout_set(self,val = 9000):#WLC99
+        if(val > 20000):
+            return
+        rx_vout_set_register = int( val/25 )
+        Data16 = rx_vout_set_register.to_bytes(2, byteorder='big')
+        MSB = Data16[0]
+        LSB = Data16[1]
+        send_buff = [Data16[1], Data16[0]]
+        self.write(0x00AA,send_buff)
+        
+    def wlc98_vout_set(self,val = 9000):#WLC98
+        if(val > 20000):
+            return
+        rx_vout_set_register = int( val/25 )
+        Data16 = rx_vout_set_register.to_bytes(2, byteorder='big')
+        MSB = Data16[0]
+        LSB = Data16[1]
+        send_buff = [Data16[1], Data16[0]]
+        self.write(0x00B4,send_buff)

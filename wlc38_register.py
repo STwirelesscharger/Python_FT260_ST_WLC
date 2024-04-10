@@ -46,6 +46,7 @@ GPIO_FUNC_OD_LO = 0x29,                    #///< 29 - out_od: driven low
 GPIO_FUNC_OD_HI = 0x2A,                    #///< 2A - out_od: driven high
 GPIO_FUNC_PP_LO = 0x2B,                    #///< 2B - out_pp: driven low
 GPIO_FUNC_PP_HI = 0x0C,                    #///< 2C - out_pp: driven high
+
 BIT_RX_OVTP_INTR_EN	 = 0
 #0x0: Disabled0x1: Enabled
 BIT_RX_OCP_INTR_EN	 = 1
