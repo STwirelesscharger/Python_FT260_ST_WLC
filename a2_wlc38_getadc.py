@@ -13,7 +13,11 @@ def wlc38_getadc():#wlc38
     die /= 10
     freq  = read_buff[8] + read_buff[9] * 256
     ntc   = read_buff[10] + read_buff[11] * 256
-    print(f"rx,vrect/mV,{vrect},vout/mV,{vout},cur/mA,{iin},die/C,{die},freq/khz,{freq},ntc,{ntc}")
+    if(ntc < 32768):
+        ntc = (ntc*3600/16384)+1800
+    else:
+        ntc = 1800-((65536-ntc)*3600/16384)
+    print(f"rx,vrect/mV,{vrect},vout/mV,{vout},cur/mA,{iin},die/C,{die},freq/khz,{freq},ntc/mV,{ntc}")
 
     RX_PTC_FSK_CFG = wlc38.wread16(I2CREG_RX_PTC_FSK_CFG,1)
     isEPP = (1 << BIT_RX_NEG) & RX_PTC_FSK_CFG
@@ -50,7 +54,7 @@ wlc38_getadc()
 # ChipID:0x0026 rev:3 patchid:0x1437 cfgid:0x1F47
 # CHIPID_WLC38
 # [WR],@0x0x92 >> 0xBE 0x14 0x7E 0x13 0x2B 0x00 0x14 0x01 0x92 0x00 0x8B 0xE7
-# rx,vrect/mV,5310,vout/mV,4990,cur/mA,43,die/C,27.6,freq/khz,146,ntc,59275
+# rx,vrect/mV,5310,vout/mV,4990,cur/mA,43,die/C,27.6,freq/khz,146,,ntc/mV,430.6640625
 # [WR],@0x0xad >> 0x01
 # BPP Mode
 # [WR],@0x0xa4 >> 0x7E 0xFF 0xFF 0x01 0x94
