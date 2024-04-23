@@ -181,7 +181,5 @@ class ft260_dongle():
             return
         rx_vout_set_register = int( val/25 )
         Data16 = rx_vout_set_register.to_bytes(2, byteorder='big')
-        MSB = Data16[0]
-        LSB = Data16[1]
         send_buff = [Data16[1], Data16[0]]
         self.write(0x00B4,send_buff)
