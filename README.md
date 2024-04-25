@@ -3,6 +3,9 @@
 
 
 ## Introduction
+PC Need Microsoft Visual C++ 2010 x86 and x64 Redistributable package.
+
+https://docs.microsoft.com/en-us/cpp/windows/latest-supported-vc-redist?view=msvc-170
 
 DB5077USB to I2C evaluation board for interfacing wireless applications with PC GUI tool
 [FT260 Dongle](https://www.st.com/resource/en/data_brief/steval-usbi2cft.pdf)

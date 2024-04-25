@@ -161,7 +161,7 @@ class ft260_dongle():
         rx_vout_set_h = int((val - 500)/100)
         rx_vout_set_l = int(int((val - 500)%100)/25)
         print(f"rx_vout_set_l,{rx_vout_set_l},rx_vout_set_h,{rx_vout_set_h}")
-        rx_vout_set_l = rx_vout_set_l << 5;
+        rx_vout_set_l = rx_vout_set_l << 6;
         self.write(0x00B1,rx_vout_set_l)#Cut 1.2 and newer. Program lower 2 bits of VOUT set, with 25mV resolution.
         # 0 - 0mV 1 - 25mV 2 - 50mV 3 - 75mV
         self.write(0x00B2,rx_vout_set_h)
