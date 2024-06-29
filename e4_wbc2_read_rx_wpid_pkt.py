@@ -32,35 +32,28 @@
   *
   ******************************************************************************
 """
-import driver_ft260
-from wlc98_register import *
+import serial
+from wbc2_register import *
 
-EPT_UNKNOWN                 = 0x00,             #///< Unknown (No specific/appropriate code)
-EPT_CHARGE_COMPLETE         = 0x01,             #///< Charge Complete (Charge full)
-EPT_INTERNAL_FAULT          = 0x02,             #///< Internal Fault (Rx software or logic error)
-EPT_OVER_TEMP               = 0x03,             #///< Over Temperature (Rx device over temperature)
-EPT_OVER_VOLTAGE            = 0x04,             #///< Over Voltage (Rx device over voltage)
-EPT_OVER_CURRENT            = 0x05,             #///< Over Current (Rx device over current)
-EPT_BAT_FAILURE             = 0x06,             #///< Battery Failure (Rx device battery problem)
-EPT_UNDER_VOLTAGE           = 0x07,             #///< Under Voltage (Rx device vout under voltage)
-EPT_NO_RESPONSE             = 0x08,             #///< No Response (Tx not adjusting according to CE)
-EPT_RESERVED1               = 0x09,             #///< Reserved
-EPT_NEGO_FAIL               = 0x0A,             #///< Negotiation Failure (EPP, no suitable GP)
-EPT_RESTART_POWER_TRANSFER  = 0x0B,             #///< Restart Power Transfer (EPP, start no power transfer FOD)
+ser = serial.Serial('COM6', 115200, timeout = 1)
 
+def wbc2_read(add):
+      ser.write([STWBC2_READ_HOST,add])
+      buff = ser.read(2)
+      if(buff[0] != STWBC2_READ_HOST):
+          print("[ERR] read buff[0] 0x{:02X} not equal to 0x72".format(buff[0]))
+      return buff[1]
 
-wlc98 = driver_ft260.ft260_dongle()
-wlc98.chip_info()
+rx_wpid_pkt = [0]*6
+rx_wpid_pkt[5]   =  wbc2_read(HOST_IF_WPID_MSB)
+rx_wpid_pkt[4]   =  wbc2_read(HOST_IF_WPID_4  )
+rx_wpid_pkt[3]   =  wbc2_read(HOST_IF_WPID_3  )
+rx_wpid_pkt[2]   =  wbc2_read(HOST_IF_WPID_2  )
+rx_wpid_pkt[1]   =  wbc2_read(HOST_IF_WPID_1  )
+rx_wpid_pkt[0]   =  wbc2_read(HOST_IF_WPID_LSB)
 
-
-wlc98.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
-wlc98.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_EPT))#rx send ept
-
-# Open FT260 device OK
-# [WR],@0x0x10 >> 0x00 0x34 0x31 0x30 0x32 0x35 0x30 0x51 0x14 0x00 0x00 0x00 0x19 0x00 0x19 0x00
-# Device ID 0x: 00343130323530511400000019001900
-# [WR],@0x0x0 >> 0x62 0x00 0x02 0x00 0x01 0x02 0x54 0x14 0x00 0x00 0x00 0x2C 0x06 0x00 0x02 0x51
-# ChipID:0x0062 rev:2 patchid:0x1454 cfgid:0x2C00
-# CHIPID_WLC98
-# [W],@0xCF >> 0xB
-# [W],@0x90 >> 0x10
+print("uart write 0x70 0x05 to disable tx print uart log for better uart communication")
+ser.write([STWBC2_SET_PAGE,INDEX_PAGE_LOG_DISABLE,STWBC2_SET_PAGE,INDEX_PAGE_REGS])
+print("if rx send wpid pkt to TX, you can check data")
+print("read rx wpid pkt:", ' '.join( ['0x{:02X}'.format(x) for x in list(rx_wpid_pkt)]) )
+#test log read rx wpid pkt: 0x00 0x00 0x00 0x00 0x00 0x00

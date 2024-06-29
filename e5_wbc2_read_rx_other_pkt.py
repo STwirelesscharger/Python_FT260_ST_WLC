@@ -32,35 +32,57 @@
   *
   ******************************************************************************
 """
-import driver_ft260
-from wlc98_register import *
+import serial
+from wbc2_register import *
 
-EPT_UNKNOWN                 = 0x00,             #///< Unknown (No specific/appropriate code)
-EPT_CHARGE_COMPLETE         = 0x01,             #///< Charge Complete (Charge full)
-EPT_INTERNAL_FAULT          = 0x02,             #///< Internal Fault (Rx software or logic error)
-EPT_OVER_TEMP               = 0x03,             #///< Over Temperature (Rx device over temperature)
-EPT_OVER_VOLTAGE            = 0x04,             #///< Over Voltage (Rx device over voltage)
-EPT_OVER_CURRENT            = 0x05,             #///< Over Current (Rx device over current)
-EPT_BAT_FAILURE             = 0x06,             #///< Battery Failure (Rx device battery problem)
-EPT_UNDER_VOLTAGE           = 0x07,             #///< Under Voltage (Rx device vout under voltage)
-EPT_NO_RESPONSE             = 0x08,             #///< No Response (Tx not adjusting according to CE)
-EPT_RESERVED1               = 0x09,             #///< Reserved
-EPT_NEGO_FAIL               = 0x0A,             #///< Negotiation Failure (EPP, no suitable GP)
-EPT_RESTART_POWER_TRANSFER  = 0x0B,             #///< Restart Power Transfer (EPP, start no power transfer FOD)
+ser = serial.Serial('COM6', 115200, timeout = 1)
 
+def wbc2_read(add):
+      ser.write([STWBC2_READ_HOST,add])
+      buff = ser.read(2)
+      if(buff[0] != STWBC2_READ_HOST):
+          print("[ERR] read buff[0] 0x{:02X} not equal to 0x72".format(buff[0]))
+      return buff[1]
 
-wlc98 = driver_ft260.ft260_dongle()
-wlc98.chip_info()
+print("uart write 0x70 0x05 to disable tx print uart log for better uart communication")
+ser.write([STWBC2_SET_PAGE,INDEX_PAGE_LOG_DISABLE,STWBC2_SET_PAGE,INDEX_PAGE_REGS])
 
+rx_ss      = wbc2_read(HOST_IF_SIGNAL_STRENGTH)
+print(f"rx_ss {rx_ss}")
+rx_version = wbc2_read(HOST_IF_RX_VERSION)
+print(f"rx_version {rx_version}")
+rx_chs     = wbc2_read(HOST_IF_CHARGE_STATUS)
+print(f"rx_chs {rx_chs}")
+rx_ref_q   = wbc2_read(HOST_IF_REF_Q_FACTOR)
+rx_qfact   = wbc2_read(HOST_IF_Q_FACTOR)
+print(f"rx qfact {rx_ref_q} {rx_qfact}")
+rx_ce      = wbc2_read(HOST_IF_CE)
+print(f"rx_ce {rx_ce}")
+rx_rp8     = wbc2_read(HOST_IF_RP8)
+print(f"rx_rp8 {rx_rp8}")#when rx work at BPP this have value
+rx_ept     = wbc2_read(HOST_IF_EPT)#this need rx send ept packet
+print(f"rx_ept {rx_ept}")
+rx_rp24_b2 = wbc2_read(HOST_IF_RP24_B2)
+rx_rp24_b1 = wbc2_read(HOST_IF_RP24_B1)
+rx_rp24_b0 = wbc2_read(HOST_IF_RP24_B0)
+print(f"rx rp24 {rx_rp24_b2} {rx_rp24_b1} {rx_rp24_b0}")#when rx work at EPP this have value
 
-wlc98.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
-wlc98.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_EPT))#rx send ept
+# test logs:
+# rx_ss 180
+# rx_version 3
+# rx_chs 0 rx need to send chs pkt first
+# rx qfact 0 247
+# rx_ce 0
+# rx_rp8 14 this is bpp mode
+# rx_ept 11 this is rx send ept reping packet to rx
+# rx rp24 0 0 0
 
-# Open FT260 device OK
-# [WR],@0x0x10 >> 0x00 0x34 0x31 0x30 0x32 0x35 0x30 0x51 0x14 0x00 0x00 0x00 0x19 0x00 0x19 0x00
-# Device ID 0x: 00343130323530511400000019001900
-# [WR],@0x0x0 >> 0x62 0x00 0x02 0x00 0x01 0x02 0x54 0x14 0x00 0x00 0x00 0x2C 0x06 0x00 0x02 0x51
-# ChipID:0x0062 rev:2 patchid:0x1454 cfgid:0x2C00
-# CHIPID_WLC98
-# [W],@0xCF >> 0xB
-# [W],@0x90 >> 0x10
+# test logs:
+# rx_ss 135
+# rx_version 3
+# rx_chs 0 rx need to send chs pkt first
+# rx qfact 79 57
+# rx_ce 240
+# rx_rp8 0
+# rx_ept 0
+# rx rp24 80 5 2 this is epp mode

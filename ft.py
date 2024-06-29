@@ -1,9 +1,43 @@
+"""
+  ******************************************************************************
+  * Copyright (c) 2024, STMicroelectronics - All Rights Reserved
+  * Author(s): ACD (Analog Custom Devices) Software Team for STMicroelectronics.
+  *
+  * License terms: BSD 3-clause "New" or "Revised" License.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are met:
+  *
+  * 1. Redistributions of source code must retain the above copyright notice, this
+  * list of conditions and the following disclaimer.
+  *
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  * this list of conditions and the following disclaimer in the documentation
+  * and/or other materials provided with the distribution.
+  *
+  * 3. Neither the name of the copyright holder nor the names of its contributors
+  * may be used to endorse or promote products derived from this software
+  * without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *
+  ******************************************************************************
+"""
 from ft_function import *
 import struct
 import os
 _callback = None
 _ftlib = None
-#use for ft260
+
 def open_ftlib():
     global _ftlib
     if _ftlib is None:
@@ -23,7 +57,6 @@ def find_device_in_paths(vid, pid):
     dev_num = c_ulong(0)
     path_buf = c_wchar_p('/0'*128)
     s_open_device_name = u"vid_{0:04x}&pid_{1:04x}".format(vid, pid)
-    #print("Searching for {} in paths".format(s_open_device_name))
     ret = False
     _ftlib.ftCreateDeviceList(byref(dev_num))
 
@@ -34,7 +67,6 @@ def find_device_in_paths(vid, pid):
         if path_buf.value.find(s_open_device_name) > 0:
             ret = True
             valid_devices.append(path_buf.value)
-        #print("Index:%d\r\nPath:%s\r\n\r\n" % (i, path_buf.value))
 
     # For each valid device try to use the composite device (with &mi_00)
     s_open_device_name += "&mi_00"

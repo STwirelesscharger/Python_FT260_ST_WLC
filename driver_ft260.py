@@ -1,3 +1,37 @@
+"""
+  ******************************************************************************
+  * Copyright (c) 2024, STMicroelectronics - All Rights Reserved
+  * Author(s): ACD (Analog Custom Devices) Software Team for STMicroelectronics.
+  *
+  * License terms: BSD 3-clause "New" or "Revised" License.
+  *
+  * Redistribution and use in source and binary forms, with or without
+  * modification, are permitted provided that the following conditions are met:
+  *
+  * 1. Redistributions of source code must retain the above copyright notice, this
+  * list of conditions and the following disclaimer.
+  *
+  * 2. Redistributions in binary form must reproduce the above copyright notice,
+  * this list of conditions and the following disclaimer in the documentation
+  * and/or other materials provided with the distribution.
+  *
+  * 3. Neither the name of the copyright holder nor the names of its contributors
+  * may be used to endorse or promote products derived from this software
+  * without specific prior written permission.
+  *
+  * THIS SOFTWARE IS PROVIDED BY THE COPYRIGHT HOLDERS AND CONTRIBUTORS "AS IS"
+  * AND ANY EXPRESS OR IMPLIED WARRANTIES, INCLUDING, BUT NOT LIMITED TO, THE
+  * IMPLIED WARRANTIES OF MERCHANTABILITY AND FITNESS FOR A PARTICULAR PURPOSE ARE
+  * DISCLAIMED. IN NO EVENT SHALL THE COPYRIGHT HOLDER OR CONTRIBUTORS BE LIABLE
+  * FOR ANY DIRECT, INDIRECT, INCIDENTAL, SPECIAL, EXEMPLARY, OR CONSEQUENTIAL
+  * DAMAGES (INCLUDING, BUT NOT LIMITED TO, PROCUREMENT OF SUBSTITUTE GOODS OR
+  * SERVICES; LOSS OF USE, DATA, OR PROFITS; OR BUSINESS INTERRUPTION) HOWEVER
+  * CAUSED AND ON ANY THEORY OF LIABILITY, WHETHER IN CONTRACT, STRICT LIABILITY,
+  * OR TORT (INCLUDING NEGLIGENCE OR OTHERWISE) ARISING IN ANY WAY OUT OF THE USE
+  * OF THIS SOFTWARE, EVEN IF ADVISED OF THE POSSIBILITY OF SUCH DAMAGE.
+  *
+  ******************************************************************************
+"""
 from ft import *
 import atexit
 dev_addr = 0x61
@@ -7,7 +41,7 @@ CHIPID_WLC89 = 0x0159
 CHIPID_WLC98 = 0x0062
 CHIPID_WLC99 = 0x0063
 class ft260_dongle():
-    verbose = 1
+    verbose = 0
     def __init__(self, i2c_speed = 100,dev_addr_set = 0x61):
         global dev_addr
         open_ftlib()
@@ -42,6 +76,18 @@ class ft260_dongle():
             return read_buff[0] + read_buff[1] * 256
         else:
             return read_buff
+    def wreadbuff(self, RegisterAddr, ReadCount = 1):#16bit
+        if self.i2c_handle is None:
+            return None
+        reg_addr_str = struct.pack("".join(['>', 'H']), RegisterAddr)
+        #print(reg_addr_str)
+        ftI2cWrite(self.i2c_handle,dev_addr,FT260_I2C_FLAG.FT260_I2C_START,reg_addr_str)
+        (ft_status, data_real_read_len, read_buff, status) = ftI2cRead(self.i2c_handle,dev_addr,
+                                                               FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,ReadCount)
+        if(self.verbose==1):
+            print("[WR],@0x{0} >>".format( hex(RegisterAddr) ), ' '.join( ['0x{:02X}'.format(x) for x in read_buff]) )
+        return list(read_buff)
+    
     def write(self, RegisterAddr, WriteData):
         if self.i2c_handle is None:
             return None
@@ -135,25 +181,9 @@ class ft260_dongle():
             print("CHIPID_WLC98")
         elif(CHIPID_WLC99 == chipid):
             print("CHIPID_WLC99")
+        elif(CHIPID_WLC89 == chipid):
+            print("CHIPID_WLC89")
         return (patchid,cfgid,chipid)
-    def rx_data(self):#wlc38
-        read_buff = self.wread(0x0092,10)
-        vrect = read_buff[0] + read_buff[1] * 256
-        vout  = read_buff[2] + read_buff[3] * 256
-        iin   = read_buff[4] + read_buff[5] * 256
-        die   = read_buff[6] + read_buff[7] * 256
-        freq  = read_buff[8] + read_buff[9] * 256
-        #print(f"rx,vrect,{vrect},vout,{vout},cur,{iin},die,{die},freq,{freq}")
-        rx_pwr = vout * iin/1000/1000
-        rx_ctrl_err = self.wread(0x00A4,2)
-        if(0 == vrect):
-            rx_ctrl_err = 0
-        else:
-            if(rx_ctrl_err > 0x7FF):
-                rx_ctrl_err = rx_ctrl_err - 0XFFFF
-            rx_ctrl_err /= 256
-        str_data = f"{vrect},{vout},{iin},{die},{freq},{rx_ctrl_err:.1f},{rx_pwr:.2f}"
-        return (str_data,rx_pwr)
 
     def wlc38_vout_set(self,val = 5000):
         if(val > 12000):#not support
@@ -166,7 +196,7 @@ class ft260_dongle():
         # 0 - 0mV 1 - 25mV 2 - 50mV 3 - 75mV
         self.write(0x00B2,rx_vout_set_h)
 
-    def wlc99_vout_set(self,val = 9000):#WLC99
+    def wlc99_vout_set(self,val = 9000):#only support WLC99
         if(val > 20000):
             return
         rx_vout_set_register = int( val/25 )
@@ -176,7 +206,7 @@ class ft260_dongle():
         send_buff = [Data16[1], Data16[0]]
         self.write(0x00AA,send_buff)
         
-    def wlc98_vout_set(self,val = 9000):#WLC98
+    def wlc98_vout_set(self,val = 9000):#only support WLC98
         if(val > 20000):
             return
         rx_vout_set_register = int( val/25 )

@@ -32,35 +32,16 @@
   *
   ******************************************************************************
 """
-import driver_ft260
-from wlc98_register import *
+import serial
+from wbc2_register import *
 
-EPT_UNKNOWN                 = 0x00,             #///< Unknown (No specific/appropriate code)
-EPT_CHARGE_COMPLETE         = 0x01,             #///< Charge Complete (Charge full)
-EPT_INTERNAL_FAULT          = 0x02,             #///< Internal Fault (Rx software or logic error)
-EPT_OVER_TEMP               = 0x03,             #///< Over Temperature (Rx device over temperature)
-EPT_OVER_VOLTAGE            = 0x04,             #///< Over Voltage (Rx device over voltage)
-EPT_OVER_CURRENT            = 0x05,             #///< Over Current (Rx device over current)
-EPT_BAT_FAILURE             = 0x06,             #///< Battery Failure (Rx device battery problem)
-EPT_UNDER_VOLTAGE           = 0x07,             #///< Under Voltage (Rx device vout under voltage)
-EPT_NO_RESPONSE             = 0x08,             #///< No Response (Tx not adjusting according to CE)
-EPT_RESERVED1               = 0x09,             #///< Reserved
-EPT_NEGO_FAIL               = 0x0A,             #///< Negotiation Failure (EPP, no suitable GP)
-EPT_RESTART_POWER_TRANSFER  = 0x0B,             #///< Restart Power Transfer (EPP, start no power transfer FOD)
+import serial
+from wbc2_register import *
+
+ser = serial.Serial('COM6', 115200, timeout = 1)
+
+print("uart write 0x70 0x04 to enable tx print uart log for connect GUI")
+ser.write([STWBC2_SET_PAGE,INDEX_PAGE_LOG_EN])
 
 
-wlc98 = driver_ft260.ft260_dongle()
-wlc98.chip_info()
 
-
-wlc98.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
-wlc98.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_EPT))#rx send ept
-
-# Open FT260 device OK
-# [WR],@0x0x10 >> 0x00 0x34 0x31 0x30 0x32 0x35 0x30 0x51 0x14 0x00 0x00 0x00 0x19 0x00 0x19 0x00
-# Device ID 0x: 00343130323530511400000019001900
-# [WR],@0x0x0 >> 0x62 0x00 0x02 0x00 0x01 0x02 0x54 0x14 0x00 0x00 0x00 0x2C 0x06 0x00 0x02 0x51
-# ChipID:0x0062 rev:2 patchid:0x1454 cfgid:0x2C00
-# CHIPID_WLC98
-# [W],@0xCF >> 0xB
-# [W],@0x90 >> 0x10

@@ -33,34 +33,36 @@
   ******************************************************************************
 """
 import driver_ft260
-from wlc98_register import *
-
-EPT_UNKNOWN                 = 0x00,             #///< Unknown (No specific/appropriate code)
-EPT_CHARGE_COMPLETE         = 0x01,             #///< Charge Complete (Charge full)
-EPT_INTERNAL_FAULT          = 0x02,             #///< Internal Fault (Rx software or logic error)
-EPT_OVER_TEMP               = 0x03,             #///< Over Temperature (Rx device over temperature)
-EPT_OVER_VOLTAGE            = 0x04,             #///< Over Voltage (Rx device over voltage)
-EPT_OVER_CURRENT            = 0x05,             #///< Over Current (Rx device over current)
-EPT_BAT_FAILURE             = 0x06,             #///< Battery Failure (Rx device battery problem)
-EPT_UNDER_VOLTAGE           = 0x07,             #///< Under Voltage (Rx device vout under voltage)
-EPT_NO_RESPONSE             = 0x08,             #///< No Response (Tx not adjusting according to CE)
-EPT_RESERVED1               = 0x09,             #///< Reserved
-EPT_NEGO_FAIL               = 0x0A,             #///< Negotiation Failure (EPP, no suitable GP)
-EPT_RESTART_POWER_TRANSFER  = 0x0B,             #///< Restart Power Transfer (EPP, start no power transfer FOD)
+from wlc99_register import *
+import time
+#QI 1.3 define
+QI13_Head_Digest_Response      = 0x11
+QI13_Head_Certificate_Response = 0x12
+QI13_Head_Challenge_Response   = 0x13
+#QI 1.3 define
+QI13_Head_Digest_Request      = 0x19
+QI13_Head_Certificate_Request = 0x1A
+QI13_Head_Challenge_Request   = 0x1B
 
 
-wlc98 = driver_ft260.ft260_dongle()
-wlc98.chip_info()
+wlc99 = driver_ft260.ft260_dongle(i2c_speed = 100,dev_addr_set = 0x2C)
+wlc99.chip_info()
 
+#rx put some type tx and this tx can qi 1.3 dts packet
+def wlc99_dts_send(SendMsg):
+    wlc99.write16(I2CREG_DTS_SEND,len(SendMsg))#set dts length
+    wlc99.write16(I2CREG_DTS_SEND+1,0x02)#request see qi spec
+    wlc99.write16(DTS_SEND_MSG_000,SendMsg)
+    wlc99.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_DTS))
+    time.sleep(1)
+    print("read int and read buff")
+    wlc99.wread16(I2CREG_RX_INTR_LATCH,4)#read int status
+    dts_rcv_cnt = wlc99.wread16(I2CREG_DTS_RCVD,1)
+    print(f"dts_rcv_cnt,{dts_rcv_cnt}")
+    if(dts_rcv_cnt > 1) & (dts_rcv_cnt < 255):
+        wlc99.wread16(DTS_RCVD_MSG_000,dts_rcv_cnt)
+    else:
+        print("[FAIL]")
 
-wlc98.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
-wlc98.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_EPT))#rx send ept
-
-# Open FT260 device OK
-# [WR],@0x0x10 >> 0x00 0x34 0x31 0x30 0x32 0x35 0x30 0x51 0x14 0x00 0x00 0x00 0x19 0x00 0x19 0x00
-# Device ID 0x: 00343130323530511400000019001900
-# [WR],@0x0x0 >> 0x62 0x00 0x02 0x00 0x01 0x02 0x54 0x14 0x00 0x00 0x00 0x2C 0x06 0x00 0x02 0x51
-# ChipID:0x0062 rev:2 patchid:0x1454 cfgid:0x2C00
-# CHIPID_WLC98
-# [W],@0xCF >> 0xB
-# [W],@0x90 >> 0x10
+print("RX Send QIV13_GetDigest")
+wlc99_dts_send([QI13_Head_Digest_Request,0x0F])
