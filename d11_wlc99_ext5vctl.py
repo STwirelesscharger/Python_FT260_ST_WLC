@@ -38,12 +38,24 @@ import time
 
 wlc99 = driver_ft260.ft260_dongle(i2c_speed = 100,dev_addr_set = 0x2C)
 wlc99.chip_info()
-
+wlc99.log1()
 print("this is use for external 5V demo")
+SYSREG_BaseAddr             =            0x2001C000
+PMU_0_RegAddr               =            (SYSREG_BaseAddr + 0x198)
+PMU_7_RegAddr = (SYSREG_BaseAddr + 0x19F)
+# /* External voltage > 4.8V */
+# /* Switch 5V LDO from 5V to 4.2V*/
+# PMU_0_Reg8 |= PMU_EXT_5V_EN_Msk; 1<<4
+# /* Connect VDD to V5V0 pin- */
+# PMU_7_Reg8 |= PMU_VDD_SW_EN_Msk; 1<<5
+# /* Disconnect 5V LDO */
+# PMU_7_Reg8 &= ~PMU_LDO5V_SW_EN_Msk; 1<<4
+wlc99.wreadFA(PMU_0_RegAddr)#0x00
+wlc99.wreadFA(PMU_7_RegAddr)#0x13
 
-print("use extern 5V and connect WLC99 LDO5V")
-wlc99.write16(I2CREG_RX_CMD1,(1<<BIT_RX_EXT5V_ON))
-time.sleep(1)
+wlc99.writeFA(PMU_0_RegAddr,1<<4)
+wlc99.writeFA(PMU_7_RegAddr,0x23)
 
-input("remove extern 5V and dis-connect WLC99 LDO5V")
-wlc99.write16(I2CREG_RX_CMD1,(1<<BIT_RX_EXT5V_OFF))
+
+
+

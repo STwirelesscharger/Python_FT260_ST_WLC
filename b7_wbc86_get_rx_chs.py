@@ -39,6 +39,7 @@ wbc86.chip_info()
 wbc86.log1()
 
 print("tx patch must update >= 0x1251")
+#https://github.com/STwirelesscharger/STSW-WPSTUDIO/blob/main/STSW-WBC86FWBPP/STEVAL-WBC86TX_FW_p1258c1240.zip
 print("use rx to send CHS Packet or use a7_wlc38_send_chs.py")
 wbc86.wread16(I2CREG_GET_RXPP_DATA,8)
 rxchs = wbc86.wread16(I2CREG_TX_RX_CHS,1)

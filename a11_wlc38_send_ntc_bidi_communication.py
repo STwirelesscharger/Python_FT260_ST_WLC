@@ -33,35 +33,32 @@
   ******************************************************************************
 """
 import driver_ft260
-from wlc98_register import *
+from wlc38_register import *
 import time
-wlc98 = driver_ft260.ft260_dongle()
-wlc98.chip_info()
+wlc38 = driver_ft260.ft260_dongle()
+wlc38.chip_info()
+wlc38.log1()
 
-STSC_RP24_Req= [0x48, 0x24, 0x52, 200, 0x00]
+def wlc38_bidi_communication(send_buff = [0x19,0x38]):
+  wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
+  wlc38.write16(I2CREG_RCVD_MSG,[0]*8)#clear read buff
+  wlc38.write16(I2CREG_SEND_MSG,send_buff)
+  wlc38.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_MSG_WAIT_REPLY))
+  time.sleep(1)
+  print("read int and read buff")
+  tx_reply_data = wlc38.wread16(I2CREG_RCVD_MSG,8)#0X0190
+  print("tx_reply_data: ", ' '.join( ['0x{:02X}'.format(x) for x in tx_reply_data]) )
+  intr_latch = wlc38.wread16(I2CREG_RX_INTR_LATCH,4)#read int status
+  if(intr_latch[0] & (1<<BIT_RX_RCVD_MSG_INTR_LATCH) == (1<<BIT_RX_RCVD_MSG_INTR_LATCH)):
+        print("BIT_RX_RCVD_MSG_INTR_LATCH")
+  wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
 
-def wlc98_send_pp(packet):
-    wlc98.write16(I2CREG_SEND_MSG,packet)#rx send 0x38 0x3B 0x88 0x66 packet
-    wlc98.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_MSG_WAIT_REPLY))
-    time.sleep(1)
-    print("read int and read buff")
-    tx_reply_data = wlc98.wread16(I2CREG_RCVD_MSG,8)#0X0190
-    print("tx_reply_data: ", ' '.join( ['0x{:02X}'.format(x) for x in tx_reply_data]) )
-    wlc98.wread16(I2CREG_RX_INTR_LATCH,4)#read int status
-    wlc98.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
+def wlc38_send_ntc():
+    ntc = wlc38.wread16(I2CREG_RX_NTC,2)#0x009C
+    if(ntc < 32768):
+        ntc = (ntc*3600/16384)+1800
+    else:
+        ntc = 1800-((65536-ntc)*3600/16384)
+    wlc38_bidi_communication([0x58,0x1F,ntc<<8,ntc&0xFF,0x00,0x00])#use 0x58 head packet to send
 
-wlc98_send_pp(STSC_RP24_Req)
-
-# Open FT260 device OK
-# [WR],@0x0x10 >> 0x00 0x34 0x31 0x30 0x32 0x35 0x30 0x51 0x14 0x00 0x00 0x00 0x19 0x00 0x19 0x00
-# Device ID 0x: 00343130323530511400000019001900
-# [WR],@0x0x0 >> 0x62 0x00 0x02 0x00 0x01 0x02 0x54 0x14 0x00 0x00 0x00 0x2C 0x06 0x00 0x02 0x51
-# ChipID:0x0062 rev:2 patchid:0x1454 cfgid:0x2C00
-# CHIPID_WLC98
-# [W],@0x0x180 >> 0x48 0x24 0x52 0xC8 0x00
-# [W],@0x90 >> 0x8
-# read int and read buff
-# [WR],@0x0x190 >> 0x1E 0x01 0x1F 0x00 0x00 0x00 0x00 0x00
-# tx_reply_data:  0x1E 0x01 0x1F 0x00 0x00 0x00 0x00 0x00
-# [WR],@0x0x88 >> 0xE4 0x0C 0x01 0x00
-# [W],@0x0x84 >> 0xFF 0xFF 0xFF 0xFF
+wlc38_send_ntc()

@@ -38,22 +38,26 @@ import time
 wlc38 = driver_ft260.ft260_dongle()
 wlc38.chip_info()
 wlc38.log1()
-#rx put some type tx and this tx can reply ask 0x38 packet
-wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
-wlc38.write16(I2CREG_RCVD_MSG,[0]*8)#clear read buff
-#wlc38.write16(I2CREG_SEND_MSG,[0x38,0x3B,0x88,0x66])#rx send 0x38 0x3B 0x88 0x66 packet
-wlc38.write16(I2CREG_SEND_MSG,[0x19,0x38])#rx send 0x19 0x38 pp packet
-wlc38.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_MSG_WAIT_REPLY))
-time.sleep(1)
-print("read int and read buff")
-tx_reply_data = wlc38.wread16(I2CREG_RCVD_MSG,8)#0X0190
-print("tx_reply_data: ", ' '.join( ['0x{:02X}'.format(x) for x in tx_reply_data]) )
-#tx_reply_data:  0x97 0xC3 0xB4 0xE0 0x2F 0x86 0x68 0xC1 patchid:0x1437 cfgid:0x1F47
 
-intr_latch = wlc38.wread16(I2CREG_RX_INTR_LATCH,4)#read int status
-if(intr_latch[0] & (1<<BIT_RX_RCVD_MSG_INTR_LATCH) == (1<<BIT_RX_RCVD_MSG_INTR_LATCH)):
-      print("BIT_RX_RCVD_MSG_INTR_LATCH")
-wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
+def wlc38_bidi_communication(send_buff = [0x19,0x38]):
+  #rx put some type tx and this tx can reply ask 0x38 packet
+  wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
+  wlc38.write16(I2CREG_RCVD_MSG,[0]*8)#clear read buff
+  #wlc38.write16(I2CREG_SEND_MSG,[0x38,0x3B,0x88,0x66])#rx send 0x38 0x3B 0x88 0x66 packet
+  wlc38.write16(I2CREG_SEND_MSG,send_buff)#rx send 0x19 0x38 pp packet
+  wlc38.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_MSG_WAIT_REPLY))
+  time.sleep(1)
+  print("read int and read buff")
+  tx_reply_data = wlc38.wread16(I2CREG_RCVD_MSG,8)#0X0190
+  print("tx_reply_data: ", ' '.join( ['0x{:02X}'.format(x) for x in tx_reply_data]) )
+  #tx_reply_data:  0x97 0xC3 0xB4 0xE0 0x2F 0x86 0x68 0xC1 patchid:0x1437 cfgid:0x1F47
+  intr_latch = wlc38.wread16(I2CREG_RX_INTR_LATCH,4)#read int status
+  if(intr_latch[0] & (1<<BIT_RX_RCVD_MSG_INTR_LATCH) == (1<<BIT_RX_RCVD_MSG_INTR_LATCH)):
+        print("BIT_RX_RCVD_MSG_INTR_LATCH")
+  wlc38.write16(I2CREG_RX_INTR_CLR,[0xFF,0xFF,0xFF,0xFF])#clear intr
+
+
+wlc38_bidi_communication([0x19,0x38])
 
 #test log
 # Open FT260 device OK

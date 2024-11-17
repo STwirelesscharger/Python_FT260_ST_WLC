@@ -38,7 +38,8 @@ from wbc2_register import *
 ser = serial.Serial('COM6', 115200, timeout = 1)
 
 def wbc2_read(add):
-      ser.write([STWBC2_READ_HOST,add])
+      ser.write([STWBC2_READ_HOST,add])#0x72
+      print(f"ser write 0x72 0x{add:X}")
       buff = ser.read(2)
       if(buff[0] != STWBC2_READ_HOST):
           print("[ERR] read buff[0] 0x{:02X} not equal to 0x72".format(buff[0]))
@@ -86,3 +87,24 @@ print(f"rx rp24 {rx_rp24_b2} {rx_rp24_b1} {rx_rp24_b0}")#when rx work at EPP thi
 # rx_rp8 0
 # rx_ept 0
 # rx rp24 80 5 2 this is epp mode
+
+# test logs:
+# ser write 0x72 0x1E
+# rx_ss 140
+# ser write 0x72 0x1F
+# rx_version 131
+# ser write 0x72 0x20
+# rx_chs 0
+# ser write 0x72 0x21
+# ser write 0x72 0x22
+# rx qfact 79 56
+# ser write 0x72 0x23
+# rx_ce 249
+# ser write 0x72 0x24
+# rx_rp8 0
+# ser write 0x72 0x25
+# rx_ept 0
+# ser write 0x72 0x26
+# ser write 0x72 0x27
+# ser write 0x72 0x28
+# rx rp24 251 4 4

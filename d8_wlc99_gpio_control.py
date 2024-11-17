@@ -47,6 +47,16 @@ wlc99.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_PP_HI)
 time.sleep(1)
 print("example code set gpio0 pin pp low")
 wlc99.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_PP_LO)
+time.sleep(1)
+print("example code set gpio0 pin as ask block feature")
+wlc99.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_RX_DIS_COM)
+print("extern use 1.8V to GPIO0 and will block ask communication")
+print("if you want use other gpio, just set other gpio to this feature")
+wlc99.write16(I2CREG_GPIO1_FUNC,GPIO_FUNC_RX_DIS_COM)
+print("extern use 1.8V to GPIO0 and will block ask communication")
+
+print("set gpio 0 as power good indicate")
+wlc99.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_RX_PWR_OUT)
 
 # Open FT260 device OK
 # [WR],@0x0x10 >> 0x00 0x35 0x38 0x30 0x38 0x52 0x36 0x47 0x0D 0x00 0x00 0x00 0x1B 0x00 0x20 0x00

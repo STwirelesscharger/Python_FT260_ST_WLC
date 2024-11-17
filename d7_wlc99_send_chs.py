@@ -42,6 +42,7 @@ rx_send_chargeStatus_value = 100
 wlc99.write16(I2CREG_SEND_MSG,[0x05,rx_send_chargeStatus_value])
 wlc99.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_MSG))
 print("rx send CHS packet value = 100 mean full charge")
+
 # Open FT260 device OK
 # [WR],@0x0x10 >> 0x00 0x35 0x38 0x30 0x38 0x52 0x36 0x47 0x0D 0x00 0x00 0x00 0x1B 0x00 0x20 0x00
 # Device ID 0x: 00353830385236470D0000001B002000

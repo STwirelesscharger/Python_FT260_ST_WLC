@@ -74,5 +74,10 @@ def wbc86_getfod():
     if(0 == tx_fod_ploss_thres):
         print("fod is disable")
 
-wbc86_getfod()
+
+#wbc86_getfod()
 #test log STWBC86,tx_tfrd_pwr,390,rx_rcvd_pwr,468,diff,-78,thres,128,cnt,4
+
+wbc86_getadc()
+
+

@@ -51,5 +51,6 @@ EPT_RESTART_POWER_TRANSFER  = 0x0B,             #///< Restart Power Transfer (EP
 wlc38 = driver_ft260.ft260_dongle()
 wlc38.chip_info()
 
-wlc38.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
+#wlc38.write16(I2CREG_RX_EPT_MSG,EPT_RESTART_POWER_TRANSFER)
+wlc38.write16(I2CREG_RX_EPT_MSG,EPT_CHARGE_COMPLETE)
 wlc38.write16(I2CREG_RX_CMD,(1<<BIT_RX_SEND_EPT))#rx send ept

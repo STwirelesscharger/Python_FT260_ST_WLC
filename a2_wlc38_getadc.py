@@ -53,8 +53,8 @@ def wlc38_getadc():
         ntc = 1800-((65536-ntc)*3600/16384)
     print(f"rx,vrect/mV,{vrect},vout/mV,{vout},cur/mA,{iin},die/C,{die},freq/khz,{freq},ntc/mV,{ntc}")
 
-    RX_PTC_FSK_CFG = wlc38.wread16(I2CREG_RX_PTC_FSK_CFG,1)
-    isEPP = (1 << BIT_RX_NEG) & RX_PTC_FSK_CFG
+    RX_PTC_FSK_CFG = wlc38.wread16(I2CREG_RX_PTC_FSK_CFG,1)#0x00AD
+    isEPP = (1 << BIT_RX_NEG) & RX_PTC_FSK_CFG #BIT_RX_NEG	 = 3
     if(0 == isEPP):
         print("BPP Mode")
     else:

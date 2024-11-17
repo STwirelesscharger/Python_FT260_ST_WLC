@@ -53,6 +53,17 @@ if(value & 0x02):
 else:
     print("gpio1 input low")
 
+GPIO_PULL_UP_DN_RegAddr = 0x2001A014
+# GPIO_PULL_UP_DN_RegAddr is 0x2001A014 
+# set 1 mean internal pull up
+# set 0 mean internal pull down
+wbc86.writeFA(0x2001A014,0x00)#set all gpio internal pull down
+
+# GPIO_PULL_EN_RegAddr is 0x2001A010 
+# set 1 mean enable internal pull up or down
+# set 0 mean disable
+GPIO_PULL_EN_RegAddr = 0x2001A010
+wbc86.writeFA(0x2001A010,0x00)#disable all gpio internal
 
 #test log
 # Open FT260 device OK

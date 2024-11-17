@@ -37,7 +37,8 @@ from wbc86_register import *
 wbc86 = driver_ft260.ft260_dongle()
 wbc86.chip_info()
 wbc86.log1()
-print("tx patch must update >= 0x1251, rx ask recv pp data will store in i2c reg address 0x0100")
+print("tx patch version must update >= 0x1251, rx ask recv pp data will store in i2c reg address 0x0100")
+#https://github.com/STwirelesscharger/STSW-WPSTUDIO/blob/main/STSW-WBC86FWBPP/STEVAL-WBC86TX_FW_p1258c1240.zip
 print("use rx to send some pp packet or use a4_wlc38_send_recv_pp_packet.py")
 wbc86.wread16(I2CREG_GET_RXPP_DATA,8)
 

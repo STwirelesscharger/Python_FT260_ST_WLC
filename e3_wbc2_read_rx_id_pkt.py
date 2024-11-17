@@ -39,6 +39,7 @@ ser = serial.Serial('COM6', 115200, timeout = 1)
 
 def wbc2_read(add):
       ser.write([STWBC2_READ_HOST,add])
+      print(f"ser write 0x72 0x{add:X}")
       buff = ser.read(2)
       if(buff[0] != STWBC2_READ_HOST):
           print("[ERR] read buff[0] 0x{:02X} not equal to 0x72".format(buff[0]))
@@ -69,8 +70,8 @@ def wbc2_read_man_code():
 
 print("uart write 0x70 0x05 to disable tx print uart log for better uart communication")
 ser.write([STWBC2_SET_PAGE,INDEX_PAGE_LOG_DISABLE,STWBC2_SET_PAGE,INDEX_PAGE_REGS])
-wbc2_read_id()
-wbc2_read_man_code()
+wbc2_read_id()#0X72 0X12 0X72 0X13 0X72 0X14 0X72 0X15 0X72 0X16 0X72 0X17
+#wbc2_read_man_code()
 # test log
 # read rx id pkt: 0x44 0x33 0x22 0x11 0x16 0x00
 # rx id man code 0x00 0x16

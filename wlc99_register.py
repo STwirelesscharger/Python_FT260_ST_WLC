@@ -181,6 +181,9 @@ BIT_REPING_DELAY	 = 0
 #Qi 1.3 Power Transfer Contract re-ping delay. In units of 200ms, Max is 12.6s
 I2CREG_OP_SUB_MODE	 = 0x008E 	# Len = 1
 I2CREG_OP_MODE	 = 0x008F 	# Len = 1
+# Operation mode
+# 0x1: Standalone (debug) mode
+# 0x2: Qi RX mode
 I2CREG_RX_INTR_LATCH	 = 0x0090 	# Len = 4
 BIT_RX_OVTP_INTR_LATCH	 = 0
 #0x0: Did not occur0x1: Occurred

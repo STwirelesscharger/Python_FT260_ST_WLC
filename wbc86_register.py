@@ -41,6 +41,9 @@ I2CREG_RAM_PATCH_ID	 = 0x0008 	# Len = 2
 I2CREG_CFG_ID	 = 0x000A 	# Len = 2
 I2CREG_PE_ID	 = 0x000C 	# Len = 1
 I2CREG_OP_MODE	 = 0x000E 	# Len = 1
+# Operation mode
+# 0x1: Standalone (debug) mode
+# 0x3: Qi TX mode
 I2CREG_OP_SUB_MODE	 = 0x000F 	# Len = 1
 I2CREG_DEVICE_ID	 = 0x0010 	# Len = 16
 I2CREG_SYS_CMD	 = 0x0020 	# Len = 1
@@ -326,6 +329,10 @@ I2CREG_SEND_MSG_00	 = 0x0200#tx send address
 I2CREG_RCVD_MSG_00	 = 0x0216#tx get rx data
 #HW reg address
 HWREG_GPIO_INPUT_VAL_RegAddr = 0x2001A01C
+GPIO_PULL_UP_DN_RegAddr = 0x2001A014
+# GPIO_PULL_UP_DN_RegAddr is 0x2001A014 
+# set 1 mean internal pull up
+# set 0 mean internal pull down
 SYSREG_RESET_Reg             = 0x2001C00C
 HWREG_FTP_CTRL_ADDR          = 0x2001C1D4
 HWREG_FTP_USER_LOCK_NUM_ADDR = 0x2001C1D7

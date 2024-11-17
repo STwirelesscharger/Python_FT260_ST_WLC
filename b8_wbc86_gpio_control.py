@@ -43,3 +43,17 @@ time.sleep(1)
 print("example code set gpio6/intb pin low")
 wbc86.write16(I2CREG_GPIO6_FUNC,GPIO_FUNC_PP_LO)
 
+
+QiTxStat_PwrTfrStart = 0x40
+#example for control led when tx is in power transfer mode
+for item in range(0,10):
+    time.sleep(0.1)
+    sub_mode = wbc86.wread16(I2CREG_OP_SUB_MODE)#0x000F
+    if(sub_mode >= QiTxStat_PwrTfrStart):
+        print("example code set gpio0 pin high")
+        wbc86.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_PP_HI)
+    else:
+        print("example code set gpio0 pin low")
+        wbc86.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_PP_LO)
+
+#or use tx_ce_to_intr_latch and tx_ce_pkt_rvcd_intr_latch to control

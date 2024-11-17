@@ -41,6 +41,9 @@ I2CREG_RAM_PATCH_ID	 = 0x0008 	# Len = 2
 I2CREG_CFG_ID	 = 0x000A 	# Len = 2
 I2CREG_PE_ID	 = 0x000C 	# Len = 2
 I2CREG_OP_MODE	 = 0x000E 	# Len = 1
+# Operation mode
+# 0x1: Standalone (debug) mode
+# 0x2: Qi RX mode
 I2CREG_OP_SUB_MODE	 = 0x000F 	# Len = 1
 I2CREG_DEVICE_ID	 = 0x0010 	# Len = 16
 I2CREG_SYS_ERR_LATCH	 = 0x002C 	# Len = 4
@@ -270,27 +273,38 @@ I2CREG_RX_PTC_FSK_CFG	 = 0x00AD 	# Len = 1
 BIT_RX_FSK_DEPTH	 = 0
 #0x0: -282~-249 / 30.25~63.250x1: -157~-124 / 61.5~94.50x2: -94.5~-61.5 / 124~1570x3: -63.25~-30.25 / 249~282
 BIT_RX_FSK_POLARITY	 = 2
-#0x0: Positive0x1: Negative
+#0x0: Positive 0x1: Negative
 BIT_RX_NEG	 = 3
 #0x0: BPP0x1: EPP
 I2CREG_RX_VOUT_SET	 = 0x00B1 	# Len = 2
 BIT_RX_VOUT_SET_LO	 = 6
 #MIN:0MAX:320
 I2CREG_RX_ILIM_SET	 = 0x00B5 	# Len = 1
-I2CREG_FOD_CUR_THRES	 = 0x00B6 	# Len = 5
+I2CREG_FOD_CUR_THRES	 = 0x00B6 	# Len = 5 FOD current threshold 1, in units of 8mA.
 BIT_FOD_CUR_THRES1	 = 0
 BIT_FOD_CUR_THRES2	 = 8
 BIT_FOD_CUR_THRES3	 = 16
 BIT_FOD_CUR_THRES4	 = 24
 BIT_FOD_CUR_THRES5	 = 32
-I2CREG_FOD_GAIN	 = 0x00BB 	# Len = 6
+I2CREG_FOD_GAIN	 = 0x00BB 	# Len = 6 FOD Gain scaler offset, at current 0, base is 512, default scaler is 512. Specify this value as signed (2'complement) offset.
+# 0 - 512/512
+# 1 - 513/512
+# …
+# 127 - 639/512
+# -128 - 384/512
+# …
+# -1 - 511/512
 BIT_FOD_GAIN_OFFSET0	 = 0
 BIT_FOD_GAIN_OFFSET1	 = 8
 BIT_FOD_GAIN_OFFSET2	 = 16
 BIT_FOD_GAIN_OFFSET3	 = 24
 BIT_FOD_GAIN_OFFSET4	 = 32
 BIT_FOD_GAIN_OFFSET5	 = 40
-I2CREG_FOD_OFFSET	 = 0x00C1 	# Len = 6
+I2CREG_FOD_OFFSET	 = 0x00C1 	# Len = 6 FOD offset at current 0, specified in units of 16mW.
+# 0: 0mW
+# 1: 16mW
+# …
+# 255: 4080mW
 BIT_FOD_OFFSET0	 = 0
 BIT_FOD_OFFSET1	 = 8
 BIT_FOD_OFFSET2	 = 16
