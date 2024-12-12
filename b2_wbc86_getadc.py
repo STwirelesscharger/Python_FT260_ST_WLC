@@ -45,7 +45,7 @@ def wbc86_getadc():
     die   = read_buff[6] + read_buff[7] * 256
     die /= 10
     ntc  = read_buff[8] + read_buff[9] * 256
-    ntc =  ntc/4 * 1500/1024
+    ntc =  ntc/4 * 1500/1024   #randge is 
     adcin =read_buff[10] + read_buff[11] * 256
     freq = read_buff[12] + read_buff[13] * 256
     freq *= 4

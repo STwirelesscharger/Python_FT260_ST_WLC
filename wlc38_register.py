@@ -82,7 +82,7 @@ GPIO_FUNC_RX_PWR_NEGO_OD = 0x0D,           #///< 0D - out_od: Power negotiated (
 GPIO_FUNC_OD_LO = 0x29,                    #///< 29 - out_od: driven low
 GPIO_FUNC_OD_HI = 0x2A,                    #///< 2A - out_od: driven high
 GPIO_FUNC_PP_LO = 0x2B,                    #///< 2B - out_pp: driven low
-GPIO_FUNC_PP_HI = 0x0C,                    #///< 2C - out_pp: driven high
+GPIO_FUNC_PP_HI = 0x2C,                    #///< 2C - out_pp: driven high
 
 BIT_RX_OVTP_INTR_EN	 = 0
 #0x0: Disabled0x1: Enabled
@@ -336,4 +336,12 @@ I2CREG_RCVD_MSG  = 0x0190
 DTS_SEND_MSG_000        = 0X0200
 DTS_RCVD_MSG_000        = 0x0280
 #HW reg address
-HWREG_GPIO_INPUT_VAL_RegAddr = 0x2001A01C
+GPIO_ID0 = 0 #///< GPIO 0
+GPIO_ID1 = 1 #///< GPIO 1
+GPIO_ID2 = 2 #///< GPIO 2
+GPIO_ID3 = 3 #///< GPIO 3 (also known as INTB Pin)
+GPIO_BaseAddr = 0x2001A000
+HWREG_GPIO_PULL_EN_RegAddr = GPIO_BaseAddr + 0x10
+HWREG_GPIO_PULL_UP_DN_RegAddr = GPIO_BaseAddr + 0x14
+HWREG_GPIO_INPUT_VAL_RegAddr = GPIO_BaseAddr + 0x1C
+

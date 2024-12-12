@@ -42,7 +42,7 @@ print("connect external 1.8V to GPIO1")
 wbc86.write16(I2CREG_GPIO0_FUNC,GPIO_FUNC_IN_PD)
 wbc86.write16(I2CREG_GPIO1_FUNC,GPIO_FUNC_IN_PD)
 
-value = wbc86.wreadFA(HWREG_GPIO_INPUT_VAL_RegAddr)
+value = wbc86.wreadFA(HWREG_GPIO_INPUT_VAL_RegAddr)#0x2001A01C
 print(f"gpio input value 0x{value:X}")
 if(value & 0x01):
     print("gpio0 input high")

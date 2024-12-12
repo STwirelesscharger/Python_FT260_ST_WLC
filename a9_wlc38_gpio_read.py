@@ -52,3 +52,4 @@ if(value & 0x02):
     print("gpio1 input high")
 else:
     print("gpio1 input low")
+

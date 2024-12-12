@@ -69,7 +69,7 @@ class ft260_dongle():
         (ft_status, data_real_read_len, read_buff, status) = ftI2cRead(self.i2c_handle,dev_addr,
                                                                FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,ReadCount)
         if(self.verbose==1):
-            print("[WR],@0x{0} >>".format( hex(RegisterAddr) ), ' '.join( ['0x{:02X}'.format(x) for x in read_buff]) )
+            print("[WR],@0x{0:04X} >>".format(RegisterAddr), ' '.join( ['0x{:02X}'.format(x) for x in read_buff]) )#hex(RegisterAddr)
         if(ReadCount == 1):
             return read_buff[0]
         elif(ReadCount == 2):
@@ -85,7 +85,7 @@ class ft260_dongle():
         (ft_status, data_real_read_len, read_buff, status) = ftI2cRead(self.i2c_handle,dev_addr,
                                                                FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,ReadCount)
         if(self.verbose==1):
-            print("[WR],@0x{0} >>".format( hex(RegisterAddr) ), ' '.join( ['0x{:02X}'.format(x) for x in read_buff]) )
+            print("[WR],@0x{0:04X} >>".format(RegisterAddr), ' '.join( ['0x{:02X}'.format(x) for x in read_buff]) )#hex(RegisterAddr)
         return list(read_buff)
     
     def write(self, RegisterAddr, WriteData):
@@ -101,9 +101,9 @@ class ft260_dongle():
         (ftStatus) = ftI2cWrite(self.i2c_handle,dev_addr,FT260_I2C_FLAG.FT260_I2C_START_AND_STOP,reg_addr_str)
         if(self.verbose==1):
             if(isinstance(WriteData,int)):
-                print("[W],@0x{0:X} >> 0x{1:X}".format( RegisterAddr , WriteData))
+                print("[W],@0x{0:04X} >> 0x{1:X}".format( RegisterAddr , WriteData))
             else:
-                print("[W],@0x{0} >>".format( hex(RegisterAddr) ), ' '.join( ['0x{:02X}'.format(x) for x in WriteData]) )
+                print("[W],@0x{0:04X} >>".format(RegisterAddr), ' '.join( ['0x{:02X}'.format(x) for x in WriteData]) )
     def write16(self, RegisterAddr, WriteData):
         self.write(RegisterAddr,WriteData)
 
@@ -161,7 +161,7 @@ class ft260_dongle():
         except OSError as err:
             print("OS error: {0}".format(err))
 
-    def chip_info(self):
+    def chip_info(self):#use for wlc38
         read_buff = self.wread16(0x0010,16)
         print("Device ID 0x:",''.join( ['{:02X}'.format(x) for x in read_buff]) )
         read_buff = self.wread(0x0000,16)
@@ -171,20 +171,44 @@ class ft260_dongle():
         cfgid = read_buff[10] + read_buff[11] * 256
         print("ChipID:0x{:04X} rev:{} patchid:0x{:04X} cfgid:0x{:04X}".format(chipid,chiprev,patchid,cfgid))
         if(chipid == 0x0000):
-            print("[ERR] chipid 0")
+            print("[ERR] chipid 0 and use FA command to test again")
+            #use fa to retry
+            read_buff = self.wreadFA(0x2001C000,8)
+            chipid = read_buff[0] + read_buff[1] * 256
+            chiprev = read_buff[2]
+            patchid = read_buff[5] + read_buff[4] * 256
+            cfgid = read_buff[7] + read_buff[6] * 256
+            print("ChipID:0x{:04X} rev:{} patchid:0x{:04X} cfgid:0x{:04X}".format(chipid,chiprev,patchid,cfgid))
             exit()
         elif(CHIPID_WLC38 == chipid):
-            print("CHIPID_WLC38")
+            cut_version = chiprev - 1
+            print(f"CHIPID_WLC38 Cut1.{cut_version}")
         elif(CHIPID_WBC86 == chipid):
             print("CHIPID_WBC86")
         elif(CHIPID_WLC98 == chipid):
             print("CHIPID_WLC98")
         elif(CHIPID_WLC99 == chipid):
             print("CHIPID_WLC99")
-        elif(CHIPID_WLC89 == chipid):
-            print("CHIPID_WLC89")
         return (patchid,cfgid,chipid)
-
+    
+    def wlc89_rom3_info(self):
+        read_buff = self.wread16(0x0000,8)
+        chipid = read_buff[0] + read_buff[1] * 256
+        chiprev = read_buff[2]
+        custid = read_buff[3]
+        patchid = read_buff[4] + read_buff[5] * 256
+        cfgid = read_buff[6] + read_buff[7] * 256
+        print("ChipID:0x{:04X} rev:0x{:02X} patchid:0x{:04X} cfgid:0x{:04X}".format(chipid,chiprev,patchid,cfgid))
+        if(chiprev == 0x20):
+            print("CUT2.1")
+        elif(chiprev == 0x30):
+            print("CUT2.2")
+        elif(chiprev == 0x40):
+            print("CUT2.3")
+        else:
+            print("[ERR] Not ROM3")
+        return (patchid,cfgid,chipid)
+    
     def wlc38_vout_set(self,val = 5000):
         if(val > 12000):#not support
             return
