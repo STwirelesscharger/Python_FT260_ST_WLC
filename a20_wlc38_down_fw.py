@@ -59,11 +59,11 @@ def FtpPoll(address, cmd):
     """
     Polls the FTP command register until the command is cleared.
     """
-    for _ in range(10):
-        time.sleep(0.1)
+    for _ in range(100):
+        time.sleep(0.01)
         wr_cmd = i2c.wread16(address)
         if wr_cmd & cmd == 0:
-            print(f"[PASS] FtpPoll 0x{address:X} = 0x{cmd:X}")
+            #print(f"[PASS] FtpPoll 0x{address:X} = 0x{cmd:X}")
             break
     else:
         print(f"[FAIL] FtpPoll 0x{address:X} = 0x{cmd:X}")
@@ -155,7 +155,7 @@ def FtpPatchCfgWriting(ftpPatchData,ftpCfgData):
     
     print("FW system reset")
     i2c.write16(FWREG_SYS_CMD_ADDR,CMD_FTP_RST_NVM_DIS)
-    time.sleep(0.1)
+    time.sleep(0.05)
     print("set password")
     i2c.write16(FWREG_NVM_WR_PWD_ADDR,0xC5)
     print("flash sector use 256bytes")
@@ -165,7 +165,7 @@ def FtpPatchCfgWriting(ftpPatchData,ftpCfgData):
     #i2c.write16(FWREG_SYS_CMD_ADDR,CMD_SWITCH_2_RX)#SKIP?
     print("SYSTEM reset")
     i2c.writeFA(HWREG_RST_ADDR,0x01)
-    time.sleep(0.1)
+    time.sleep(0.05)
     print("[DONE] FtpPatchCfgWriting")
     return ERROR.OK
 
@@ -181,7 +181,7 @@ def wlc38_update_patch_cfg(patch_file_name,cfg_file_name):
     isok = FtpPatchCfgWriting(ftpPatchData,ftpCfgData)
     if(isok != ERROR.OK):
         return isok
-    (patchid,cfgid) = i2c.chip_info()
+    (patchid,cfgid,chipid) = i2c.chip_info()
     if(patchid != patchID):
         print("Patch Error: 0x{:X} != 0x{:X}".format(patchid, patchID))
         return ERROR.PATCH_ID
@@ -195,24 +195,31 @@ def wlc38_update_patch_cfg(patch_file_name,cfg_file_name):
 def wlc38_main(patch_file_name,cfg_file_name):
     global i2c
     try:
-        i2c = driver_ft260.ft260_dongle()
+        print("default I2C dongle speed is 100Kbps")
+        i2c = driver_ft260.ft260_dongle(100)#default is 100khz
         if(i2c == None):
             return ERROR.DONGLE
-        chipid = i2c.chip_info()
+        (patchid,cfgid,chipid) = i2c.chip_info()
         if(CHIPID_WLC38 != chipid):
-            print("ERR CHIP NOT WLC38")
+            print(f"ERR CHIP 0x{chipid:X} NOT WLC38 0x0026")
             return ERROR.CHIPID
         if os.path.exists(patch_file_name) == False:
             return ERROR.FILE_NOT_FIND
         if os.path.exists(cfg_file_name) == False:
             return ERROR.FILE_NOT_FIND
-        return wlc38_update_patch_cfg(patch_file_name,cfg_file_name)
-
+        start_time = time.time()
+        err = wlc38_update_patch_cfg(patch_file_name,cfg_file_name)
+        end_time = time.time()
+        print("cost: {:.2f}sec".format(end_time - start_time))
+        return err
     except Exception as e:
         print("An exception occurred. | ", e)
         return ERROR.EXCEPTION
 
 if __name__ == "__main__":
-    input("change your patch and cfg file")
-    wlc38_main("STEVAL-xx.memh", "STEVAL-WLC38_config_XX.memh")
-
+    input("change your patch and cfg file name")
+    print("patch file name must xxx_1234.memh script use 1234 for patch version")
+    print("cfg file name must cfg1234_xxx.memh script use 1234 for cfg version")
+    #wlc38_main("STEVAL-xx.memh", "STEVAL-WLC38_config_XX.memh")
+    wlc38_main("polaris_nvmpatch_rom1_rtx_1634.memh", "cfg1063_test.memh")
+    

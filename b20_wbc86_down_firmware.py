@@ -188,13 +188,19 @@ def WBC86_main(patch_file_name, cfg_file_name):
             return ERROR.FILE_NOT_FIND
         if not os.path.exists(cfg_file_name):
             return ERROR.FILE_NOT_FIND
-        return WBC86_update_patch_cfg(patch_file_name, cfg_file_name)
+        start_time = time.time()
+        err = WBC86_update_patch_cfg(patch_file_name,cfg_file_name)
+        end_time = time.time()
+        print("cost: {:.2f}sec".format(end_time - start_time))
+        return err
     except Exception as e:
         print("An exception occurred. | ", e)
         return ERROR.EXCEPTION
 
 if __name__ == "__main__":
     input("change your patch and cfg file")
+    print("patch file name must xxx_1234.memh script use 1234 for patch version")
+    print("cfg file name must cfg1234_xxx.memh script use 1234 for cfg version")
     WBC86_main("STEVAL-WBC86TX_nvmpatch_1260.memh", "STEVAL-WBC86TX_config_121E_BPP.memh")
 
 """

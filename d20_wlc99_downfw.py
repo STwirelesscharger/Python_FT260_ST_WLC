@@ -198,7 +198,10 @@ def WLC99_main(patch_file_name, cfg_file_name):
             return ERROR.FILE_NOT_FIND
         if not os.path.exists(cfg_file_name):
             return ERROR.FILE_NOT_FIND
-        isok = WLC99_update_patch_cfg(patch_file_name, cfg_file_name)
+        start_time = time.time()
+        isok = WLC99_update_patch_cfg(patch_file_name,cfg_file_name)
+        end_time = time.time()
+        print("cost: {:.2f}sec".format(end_time - start_time))
         input("press any key to exit")
         return isok
     except Exception as e:
@@ -208,6 +211,8 @@ def WLC99_main(patch_file_name, cfg_file_name):
 if __name__ == "__main__":
     patch_file_name = "herculis_nvmpatch_rom1_ckc_0xC275.memh"
     cfg_file_name = "cfg1060_wlc99_ckc_intb_gpio6_uart1_VOUT20V.memh"
+    print("patch file name must xxx_1234.memh script use 1234 for patch version")
+    print("cfg file name must cfg1234_xxx.memh script use 1234 for cfg version")
     WLC99_main(patch_file_name, cfg_file_name)
 
 # Open FT260 device OK

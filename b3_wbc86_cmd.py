@@ -43,5 +43,8 @@ wbc86.write16(I2CREG_TX_CMD,(1<<BIT_TX_EN))
 print("set tx disable")
 wbc86.write16(I2CREG_TX_CMD,(1<<BIT_TX_DIS))
 
+print("switch to tx and start")
+wbc86.write16(I2CREG_SYS_CMD,(1<<BIT_SWITCH_2_TX))
+
 
 
